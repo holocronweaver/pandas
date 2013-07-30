@@ -987,19 +987,19 @@ def test_is_expr():
 _parsers = {'python': PythonExprVisitor, 'pytables': pytables.ExprVisitor,
             'pandas': PandasExprVisitor}
 
-def check_disallowed_nodes(visitor):
+def check_disallowed_nodes(engine, visitor):
     """make sure the disallowed decorator works"""
     VisitorClass = _parsers[visitor]
     uns_ops = VisitorClass.unsupported_nodes
-    inst = VisitorClass('x + 1')
+    inst = VisitorClass('x + 1', engine, visitor)
 
     for ops in uns_ops:
         assert_raises(NotImplementedError, getattr(inst, ops))
 
 
 def test_disallowed_nodes():
-    for visitor in _parsers:
-        check_disallowed_nodes(visitor)
+    for engine, visitor in product(_parsers, repeat=2):
+        check_disallowed_nodes(engine, visitor)
 
 
 def test_syntax_error_exprs():
